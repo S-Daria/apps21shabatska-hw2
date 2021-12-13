@@ -1,72 +1,131 @@
 package ua.edu.ucu.collections.immutable;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public final class ImmutableArrayList implements ImmutableList {
+
+    private Object[] list;
+
     public ImmutableArrayList(Object[] elements) {
+        this.list = Arrays.copyOf(elements, elements.length);
     }
 
     public ImmutableArrayList() {
+        this.list = new Object[0];
+    }
+
+    public boolean validateIndexInput(int index){
+        if (index > size() || index < 0) {
+            throw new IllegalArgumentException();
+        }
+        return true;
+    }
+
+    public boolean validateSize(){
+        if (size() == 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        return true;
     }
 
     @Override
     public ImmutableList add(Object e) {
-        return null;
+        return add(size(), e);
     }
 
     @Override
     public ImmutableList add(int index, Object e) {
-        return null;
+        return addAll(index, new Object[]{e});
     }
 
     @Override
     public ImmutableList addAll(Object[] c) {
-        return null;
+        return addAll(size(), c);
     }
 
     @Override
     public ImmutableList addAll(int index, Object[] c) {
-        return null;
+        validateIndexInput(index);
+
+        Object[] newList = new Object[size() + c.length];
+
+        int curIndx = 0;
+        for (int i = 0; i < index; i++) {
+            newList[curIndx] = get(i);
+            curIndx++;
+        }
+
+        for (Object element : c) {
+            newList[curIndx] = element;
+            curIndx++;
+        }
+
+        for (int i = index; i < size(); i++) {
+            newList[curIndx] = get(i);
+            curIndx++;
+        }
+        return new ImmutableArrayList(newList);
     }
 
     @Override
     public Object get(int index) {
-        return null;
+        validateIndexInput(index);
+        return this.list[index];
     }
 
     @Override
     public ImmutableList remove(int index) {
-        return null;
+        validateIndexInput(index);
+
+        Object[] newList = new Object[size() - 1];
+        for (int i = 0; i < size() - 1; i++) {
+            if (i >= index) {
+                newList[i] = get(i + 1);
+            }
+            else {
+                newList[i] = get(i);
+            }
+        }
+        return new ImmutableArrayList(newList);
     }
 
     @Override
     public ImmutableList set(int index, Object e) {
-        return null;
+        validateIndexInput(index);
+
+        Object[] newList = toArray();
+        newList[index] = e;
+        return new ImmutableArrayList(newList);
     }
 
     @Override
     public int indexOf(Object e) {
-        return 0;
+        validateSize();
+        for (int i = 0; i < size(); i++) {
+            if (get(i) == e) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
     public int size() {
-        return 0;
+        return this.list.length;
     }
 
     @Override
     public ImmutableList clear() {
-        return null;
+        return new ImmutableArrayList();
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size() == 0;
     }
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        return Arrays.copyOf(this.list, size());
     }
 }
