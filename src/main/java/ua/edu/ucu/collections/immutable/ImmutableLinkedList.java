@@ -1,103 +1,219 @@
 package ua.edu.ucu.collections.immutable;
 
 public final class ImmutableLinkedList implements ImmutableList {
-    public ImmutableLinkedList(Object[] elements) {
 
+    private Node head;
+    private Node tail;
+
+    public ImmutableLinkedList(Object[] elements) {
+        Node previous = null;
+        for (Object element : elements) {
+            Node current = new Node();
+            current.setValue(element);
+            current.setPrevious(previous);
+
+            if (previous == null) {
+                this.head = current;
+            } else {
+                previous.setNext(current);
+            }
+            previous = current;
+        }
+        this.tail = previous;
     }
 
     public ImmutableLinkedList() {
+        head = null;
+        tail = null;
+    }
 
+    public boolean validateIndexInput(int index){
+        if (index > size() || index < 0) {
+            throw new IllegalArgumentException();
+        }
+        return true;
+    }
+
+    public boolean validateSize(){
+        if (size() == 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        return true;
     }
 
     @Override
     public ImmutableList add(Object e) {
-        return null;
+        return add(size(), e);
     }
 
     @Override
     public ImmutableList add(int index, Object e) {
-        return null;
+        validateIndexInput(index);
+        return addAll(index, new Object[]{e});
     }
 
     @Override
     public ImmutableList addAll(Object[] c) {
-        return null;
+        return addAll(size(), c);
     }
 
     @Override
     public ImmutableList addAll(int index, Object[] c) {
-        return null;
+        validateIndexInput(index);
+
+        Object[] newList = new Object[size() + c.length];
+
+        int curIndx = 0;
+        Node curNode = head;
+
+        for (int i = 0; i < index; i++) {
+            newList[curIndx] = curNode.getValue();
+            curNode = curNode.getNext();
+            curIndx++;
+        }
+
+        for (Object element: c) {
+            newList[curIndx] = element;
+            curIndx++;
+        }
+
+        while (curNode != null) {
+            newList[curIndx] = curNode.getValue();
+            curNode = curNode.getNext();
+            curIndx++;
+        }
+
+        return new ImmutableLinkedList(newList);
     }
 
     @Override
     public Object get(int index) {
-        return null;
+        validateIndexInput(index);
+
+        Node curNode = getHead();
+
+        for (int i = 0; i < index; i++) {
+            curNode = curNode.getNext();
+        }
+        return curNode.getValue();
     }
 
     @Override
     public ImmutableList remove(int index) {
-        return null;
+        validateIndexInput(index);
+
+        Object [] newList = new Object[size() - 1];
+        Node curNode = getHead();
+
+        for (int i = 0; i < size() - 1; i++) {
+            if (i == index) {
+                curNode = curNode.getNext();
+            }
+            newList[i] = curNode.getValue();
+            curNode = curNode.getNext();
+        }
+        return new ImmutableLinkedList(newList);
     }
 
     @Override
     public ImmutableList set(int index, Object e) {
-        return null;
+        validateIndexInput(index);
+
+        Object[] newList = toArray();
+        newList[index] = e;
+        return new ImmutableLinkedList(newList);
     }
 
     @Override
     public int indexOf(Object e) {
-        return 0;
+        validateSize();
+
+        int index = 0;
+        Node curNode = getHead();
+
+        while (curNode != null) {
+            if (curNode.getValue() == e){
+                return index;
+            }
+            curNode = curNode.getNext();
+            index++;
+        }
+
+        return -1; //index == size()
+
     }
 
     @Override
     public int size() {
-        return 0;
+        int size = 0;
+
+        Node curNode = getHead();
+
+        while (curNode != null) {
+            curNode = curNode.getNext();
+            size++;
+        }
+
+        return size;
     }
 
     @Override
     public ImmutableList clear() {
-        return null;
+        return new ImmutableLinkedList();
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size() == 0;
     }
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        Object[] newList = new Object[size()];
+        Node curNode = getHead();
+
+        int i = 0;
+        while (curNode != null) {
+            newList[i] = curNode.getValue();
+            curNode = curNode.getNext();
+            i++;
+        }
+        return newList;
     }
 
     public ImmutableLinkedList addFirst(Object e) {
-        return null;
+        return (ImmutableLinkedList) add(0, e);
     }
 
     public ImmutableLinkedList addLast(Object e) {
-        return null;
+        return (ImmutableLinkedList) add(size(), e);
     }
 
     public Node getHead() {
-        return null;
+        return this.head;
     }
 
     public Node getTail() {
-        return null;
+        return this.tail;
     }
 
     public Object getFirst() {
-        return null;
+        validateSize();
+        return this.head.getValue();
     }
 
     public Object getLast() {
-        return null;
+        validateSize();
+        return tail.getValue();
     }
 
     public ImmutableLinkedList removeFirst() {
-        return null;
+        validateSize();
+        return (ImmutableLinkedList) remove(0);
     }
 
     public ImmutableLinkedList removeLast() {
-        return null;
+        validateSize();
+        return (ImmutableLinkedList) remove(size() - 1);
     }
 }
